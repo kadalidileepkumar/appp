@@ -1,0 +1,104 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enter Roll Number</title>
+</head>
+<body>
+  <h1>Enter Your Roll Number</h1>
+  <form id="rollNumberForm">
+    <label for="rollNumber">Roll Number:</label>
+    <input type="text" id="rollNumber" name="rollNumber" required>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="resultContainer" style="display: none;">
+    <h2>Result:</h2>
+    <p id="result"></p>
+  </div>
+
+  <script type="module">
+    document.getElementById('rollNumberForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const rollNumber = document.getElementById('rollNumber').value;
+
+      // Fetch the student data from data.js using the Fetch API
+      fetch('data.js')
+        .then(response => response.text())
+        .then(data => {
+          try {
+            const studentData = JSON.parse(data);
+            // Find the student with the entered roll number in the studentData
+            const student = studentData.find(s => s.rollNumber === rollNumber);
+
+            if (student) {
+              // Calculate the result for the found student
+              const result = calculateResult(student);
+
+              // Display the result
+              document.getElementById('result').textContent = `Result for Roll Number ${rollNumber}: ${result.toFixed(2)}`;
+              document.getElementById('resultContainer').style.display = 'block';
+            } else {
+              // If the student data is not found, display an error message
+              document.getElementById('result').textContent = 'Student not found with the entered roll number.';
+              document.getElementById('resultContainer').style.display = 'block';
+            }
+          } catch (error) {
+            // Handle any errors that occur during parsing the JSON data
+            console.error('Error parsing JSON:', error);
+          }
+        })
+        .catch(error => {
+          // Handle any errors that occur during data fetching
+          console.error('Error fetching data:', error);
+        });
+    });
+
+    // Function to calculate the result for a student (replace with your actual implementation)
+    function calculateResult(student) {
+      // ... (your calculation logic here)
+      let totalCredits = 0;
+      let totalWeightedGrade = 0;
+    
+      for (const subject of student.subjects) {
+        const grade = subject.grade;
+        const credits = subject.credits;
+    
+        let gradeValue = 0;
+        switch (grade) {
+          case 'A+':
+            gradeValue = 10;
+            break;
+          case 'A':
+            gradeValue = 9;
+            break;
+          case 'B':
+            gradeValue = 8;
+            break;
+          case 'C':
+            gradeValue = 7;
+            break;
+          case 'D':
+            gradeValue = 6;
+            break;
+          case 'E':
+            gradeValue = 5;
+            break;
+          default:
+            gradeValue = 0;
+        }
+    
+        totalCredits += credits;
+        totalWeightedGrade += gradeValue * credits;
+      }
+    
+      const result = totalWeightedGrade / totalCredits;
+      return result;
+    }
+  </script>
+  <script src="data.js" type="module"></script>
+</body>
+</html>
+
